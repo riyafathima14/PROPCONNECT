@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/create_account_screen.dart';
+import 'package:propconnect/createaccount_screen.dart';
 import 'package:propconnect/signin_page2.dart';
 
 class SigninPage1 extends StatefulWidget {
@@ -44,15 +44,20 @@ class _SigninPage1State extends State<SigninPage1> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+
+        leadingWidth: 200,
   leading: Padding(
     padding: const EdgeInsets.all(8.0), 
-    child: SizedBox(
-      width: 40, 
-      height: 40, 
-      child: Image.asset('assets/images/propconnectlogo1.png'),
+   child:Image.asset(
+              'assets/images/logoblue.png',
+              fit: BoxFit.contain,
+              height: 14,
+            ),
     ),
   ),
-),
+
 
       backgroundColor: Colors.white,
       body: SafeArea(
