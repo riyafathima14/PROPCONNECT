@@ -1,6 +1,10 @@
+//import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/verification_screen2.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class VerificationScreen1 extends StatefulWidget {
   final String firstName;
@@ -27,6 +31,67 @@ class VerificationScreen1 extends StatefulWidget {
 class _VerificationScreen1State extends State<VerificationScreen1> {
   bool isMobileSelected = false;
   bool isEmailSelected = false;
+  bool isOTPSending = false;
+  String errorMessage = "";
+
+  Future<void> _requestOTP() async {
+    setState(() {
+      isOTPSending = true;
+      errorMessage = "";
+    });
+
+    String contactInfo = isEmailSelected ? widget.email : widget.phone;
+    String method = isEmailSelected ? "email" : "phone";
+
+    try {
+      final response = await http.post(
+        Uri.parse("http://your-backend-ip:5000/api/send-otp"),
+        headers: {"Content - Type": "application/json"},
+        body: jsonEncode({"contact": contactInfo, "method": method}),
+      );
+      if (response.statusCode == 200) {
+        print("OTP sent successfully!");
+
+        _navigateToVerificationScreen2();
+      } else {
+        setState(() {
+          errorMessage = "Failed to send OTP. Try again. ";
+        });
+        print("Failed to send OTP: ${response.body}");
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = "Network error. Please check your connection.";
+      });
+      print("Error sending OTP: $e");
+    } finally {
+      setState(() {
+        isOTPSending = false;
+      });
+    }
+  }
+
+  void _navigateToVerificationScreen2() {
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder:
+            (context, animation, secondaryAnimation) => VerificationScreen2(
+              firstName: widget.firstName,
+              lastName: widget.lastName,
+              email: widget.email,
+              phone: widget.phone,
+              username: widget.username,
+              encryptedPassword: widget.encryptedPassword,
+              isEmailSelected: isEmailSelected,
+              isMobileSelected: isMobileSelected,
+            ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,33 +258,67 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
               ),
               const Spacer(),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder:
-                          (context, animation, secondaryAnimation) =>
-                              VerificationScreen2(
-                                firstName: widget.firstName,
-                                lastName: widget.lastName,
-                                email: widget.email,
-                                phone: widget.phone,
-                                username: widget.username,
-                                encryptedPassword: widget.encryptedPassword,
-                                isEmailSelected: isEmailSelected,
-                                isMobileSelected: isMobileSelected,
-                              ),
-                      transitionsBuilder: (
+                onPressed: () async {
+                  if (!isMobileSelected && !isEmailSelected) {
+                    print("No verification method selected!");
+                    return;
+                  }
+
+                  // Prepare payload
+                  Map<String, String> requestBody = {
+                    "email": isEmailSelected ? widget.email : "",
+                    "phone": isMobileSelected ? widget.phone : "",
+                  };
+
+                  try {
+                    final response = await http.post(
+                      Uri.parse(
+                        "http://your-backend-ip:5000/api/send-otp",
+                      ), // Replace with your Flask backend IP
+                      headers: {"Content-Type": "application/json"},
+                      body: jsonEncode(requestBody),
+                    );
+
+                    if (response.statusCode == 200) {
+                      print("OTP sent successfully!");
+
+                      // Navigate to VerificationScreen2 only after OTP is sent
+                      Navigator.pushReplacement(
                         context,
-                        animation,
-                        secondaryAnimation,
-                        child,
-                      ) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                    ),
-                  );
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  VerificationScreen2(
+                                    firstName: widget.firstName,
+                                    lastName: widget.lastName,
+                                    email: widget.email,
+                                    phone: widget.phone,
+                                    username: widget.username,
+                                    encryptedPassword: widget.encryptedPassword,
+                                    isEmailSelected: isEmailSelected,
+                                    isMobileSelected: isMobileSelected,
+                                  ),
+                          transitionsBuilder: (
+                            context,
+                            animation,
+                            secondaryAnimation,
+                            child,
+                          ) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    } else {
+                      print("Failed to send OTP: ${response.body}");
+                    }
+                  } catch (e) {
+                    print("Error sending OTP: $e");
+                  }
                 },
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF204ECF),
                   shape: RoundedRectangleBorder(
@@ -227,10 +326,16 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
                   ),
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child: Text(
-                  "Continue",
-                  style: GoogleFonts.nunito(fontSize: 16, color: Colors.white),
-                ),
+                child:
+                    isOTPSending
+                        ? CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                          "Continue",
+                          style: GoogleFonts.nunito(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
               ),
               const SizedBox(height: 25),
             ],
