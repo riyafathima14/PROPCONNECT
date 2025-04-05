@@ -47,7 +47,7 @@ class _SigninPage1State extends State<SigninPage1> {
         backgroundColor: Colors.white,
         elevation: 0,
 
-        leadingWidth: 200,
+        leadingWidth: screenWidth * 0.7,
   leading: Padding(
     padding: const EdgeInsets.all(8.0), 
    child:Image.asset(
