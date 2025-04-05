@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:propconnect/createaccount_screen.dart';
+import 'package:propconnect/homepage.dart';
+import 'package:propconnect/search_screen1.dart';
 import 'package:propconnect/signin_page1.dart';
 import 'package:propconnect/splash_screen.dart';
 
@@ -34,7 +36,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> checkBackendConnection() async {
     try {
-      final response = await http.get(Uri.parse('http://172.16.12.20:5000/')); // Replace with your Flask server's actual IP
+      final response = await http.get(Uri.parse('http://192.168.1.3:5000/'));
 
       if (response.statusCode == 200) {
         print("✅ Flask Backend Connected: ${jsonDecode(response.body)}");
@@ -61,7 +63,7 @@ class _MyAppState extends State<MyApp> {
       home: isLoading
           ? const Center(child: CircularProgressIndicator()) // Show loading indicator while checking connection
           : isBackendConnected
-              ? const CreateAccountScreen() // Proceed if backend is connected
+              ? const HomePage() // Proceed if backend is connected
               : const ErrorScreen(), // Show an error screen if connection fails
     );
   }
