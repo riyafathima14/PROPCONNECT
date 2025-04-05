@@ -3,12 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-<<<<<<< HEAD
-import 'package:propconnect/search_screen1.dart';
-=======
 import 'package:propconnect/createaccount_screen.dart';
 import 'package:propconnect/signin_page1.dart';
->>>>>>> 559766a2b7379d8676808b67a99c7c3a3d0ccd33
 import 'package:propconnect/splash_screen.dart';
 
 
@@ -61,10 +57,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       builder: DevicePreview.appBuilder,
-<<<<<<< HEAD
-      home: SearchScreen1(),
-=======
->>>>>>> 559766a2b7379d8676808b67a99c7c3a3d0ccd33
       debugShowCheckedModeBanner: false,
       home: isLoading
           ? const Center(child: CircularProgressIndicator()) // Show loading indicator while checking connection
