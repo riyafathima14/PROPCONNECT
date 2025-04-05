@@ -19,6 +19,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
