@@ -46,8 +46,8 @@ class _SigninPage1State extends State<SigninPage1> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leadingWidth: screenWidth * 0.7,
 
-        leadingWidth: 200,
   leading: Padding(
     padding: const EdgeInsets.all(8.0), 
    child:Image.asset(

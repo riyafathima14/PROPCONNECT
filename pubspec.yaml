@@ -77,6 +77,23 @@ flutter:
    - assets/images/propconnectlogo1.png
    - assets/images/logoblue.png
    - assets/images/Home.png
+   - assets/images/home_img1.png
+   - assets/images/buyicon.png
+   - assets/images/renticon.png
+   - assets/images/sellicon.png
+   - assets/images/recommendations.png
+   - assets/images/prizetrends.png
+   - assets/images/reviews.png
+   - assets/images/home_icon.png
+   - assets/images/trends_icon.png
+   - assets/images/favorites_icon.png
+   - assets/images/profile_icon.png
+   - assets/images/profile_img.png
+   - assets/images/nofavorite_img1.png
+   - assets/images/house.png
+   - assets/images/plot.png
+   - assets/images/flat.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

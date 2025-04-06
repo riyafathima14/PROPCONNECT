@@ -1,12 +1,10 @@
-//import 'dart:ffi';
+
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/verification_screen2.dart';
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 
 class VerificationScreen1 extends StatefulWidget {
   final String firstName;
@@ -47,8 +45,8 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
 
     try {
       final response = await http.post(
-        Uri.parse("http://your-backend-ip:5000/api/send-otp"),
-        headers: {"Content - Type": "application/json"},
+        Uri.parse("http://192.168.1.3:5000/api/send-otp"),
+        headers: {"Content-Type": "application/json"},
         body: jsonEncode({"contact": contactInfo, "method": method}),
       );
       if (response.statusCode == 200) {
@@ -260,33 +258,6 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
               ),
               const Spacer(),
               ElevatedButton(
-              /*  onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder:
-                          (context, animation, secondaryAnimation) =>
-                              VerificationScreen2(
-                                firstName: widget.firstName,
-                                lastName: widget.lastName,
-                                email: widget.email,
-                                phone: widget.phone,
-                                username: widget.username,
-                                encryptedPassword: widget.encryptedPassword,
-                                isEmailSelected: isEmailSelected,
-                                isMobileSelected: isMobileSelected,
-                              ),
-                      transitionsBuilder: (
-                        context,
-                        animation,
-                        secondaryAnimation,
-                        child,
-                      ) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                    ),
-                  );*/
-
                 onPressed: () async {
                   if (!isMobileSelected && !isEmailSelected) {
                     print("No verification method selected!");
