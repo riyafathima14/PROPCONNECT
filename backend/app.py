@@ -185,7 +185,7 @@ def test_sms():
         return jsonify({"error": str(e)}), 500"""
 
 
-@app.route('/send-otp', methods=['POST'])
+@app.route('/api/send-otp', methods=['POST'])
 def send_otp():
     data = request.json
     first_name = data.get('first_name')
