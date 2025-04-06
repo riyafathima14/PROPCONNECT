@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/homepage.dart';
-import 'package:propconnect/signin_page1.dart';
+import 'package:propconnect/screens/homepage.dart';
+import 'package:propconnect/screens/signin_page1.dart';
 
 class SigninPage2 extends StatefulWidget {
   const SigninPage2({super.key});

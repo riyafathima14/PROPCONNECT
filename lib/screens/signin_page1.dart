@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/createaccount_screen.dart';
-import 'package:propconnect/signin_page2.dart';
+import 'package:propconnect/screens/createaccount_screen.dart';
+import 'package:propconnect/screens/signin_page2.dart';
 
 class SigninPage1 extends StatefulWidget {
   const SigninPage1({super.key});

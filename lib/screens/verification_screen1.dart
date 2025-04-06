@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/verification_screen2.dart';
+import 'package:propconnect/screens/verification_screen2.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 

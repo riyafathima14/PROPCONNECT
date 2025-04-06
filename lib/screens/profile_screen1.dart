@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/homepage.dart';
-import 'package:propconnect/profile_screen1.dart';
+import 'package:propconnect/screens/favorites_screen.dart';
+import 'package:propconnect/screens/homepage.dart';
+import 'package:propconnect/screens/changepassword_screen.dart';
+import 'package:propconnect/screens/signin_page1.dart';
 
-class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({super.key});
+class ProfileScreen1 extends StatefulWidget {
+  const ProfileScreen1({super.key});
 
   @override
-  State<FavoritesScreen> createState() => _FavoriteScreen1State();
+  State<ProfileScreen1> createState() => _ProfileScreen1State();
 }
 
-class _FavoriteScreen1State extends State<FavoritesScreen> {
-  String activeTab = "Favorites";
+class _ProfileScreen1State extends State<ProfileScreen1> {
+  String activeTab = "Profile";
 
   void navigateTo(String tabName, Widget screen, BuildContext context) {
     setState(() {
@@ -24,7 +26,6 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -46,37 +47,81 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
         ),
       ),
       body: Padding(
-        padding:EdgeInsets.symmetric(horizontal: screenWidth/17),
-        child: Column(children: [
-          const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Favorites",
-                  style: GoogleFonts.nunito(
-                    fontSize: screenWidth * 0.06,
-                    fontWeight: FontWeight.bold,
-                  ),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Profile",
+                style: GoogleFonts.nunito(
+                  fontSize: screenWidth * 0.06,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 5),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Access all your top picks instantly!",
-                  style: GoogleFonts.nunito(
-                    fontSize: screenWidth * 0.04,
-                    color: Colors.grey,
-                  ),
+            ),
+            const SizedBox(height: 5),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Access all your top picks instantly!",
+                style: GoogleFonts.nunito(
+                  fontSize: screenWidth * 0.04,
+                  color: Colors.grey,
                 ),
               ),
-              SizedBox(height: screenHeight*0.15,),
-          _buildNoFavoritesUI(screenHeight, screenWidth),
-        ],),
+            ),
+
+            const SizedBox(height: 20),
+            CircleAvatar(
+              radius: screenWidth * 0.15,
+              backgroundColor: Colors.white,
+              child: Image.asset(
+                "assets/images/profile_img.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "riyafathimakp38@gmail.com",
+              style: GoogleFonts.nunito(
+                fontSize: screenWidth * 0.045,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Text(
+              "+919074103337",
+              style: GoogleFonts.nunito(
+                fontSize: screenWidth * 0.04,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 5),
+            TextButton(
+              onPressed: () {},
+              child: Text(
+                "Edit Your Profile",
+                style: GoogleFonts.nunito(
+                  color: Color(0xFF204ECF),
+                  fontSize: screenWidth * 0.04,
+                ),
+              ),
+            ),
+            const SizedBox(height: 50),
+            _buildProfileOption(
+              "Change Password",
+              Icons.arrow_forward_ios,
+              screenWidth,
+            ),
+            const SizedBox(height: 10),
+            _buildProfileOption("Logout", Icons.arrow_forward_ios, screenWidth),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomNavBar(screenWidth),
       floatingActionButton: FloatingActionButton(
-        shape: const CircleBorder(),
+        shape: CircleBorder(),
         backgroundColor: const Color(0xFF204ECF),
         onPressed: () {
           // Add navigation for floating button
@@ -87,49 +132,39 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
     );
   }
 
-  Widget _buildNoFavoritesUI(double screenHeight, double screenWidth) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/nofavorite_img1.png',
-              width: 104,
-              height: 104,
-            ),
-            const SizedBox(height: 20),
-            RichText(
-  textAlign: TextAlign.center,
-  text: TextSpan(
-    style: GoogleFonts.nunito(
-      color: Colors.black,
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
-    ),
-    children: [
-      TextSpan(
-        text: "You haven’t added\n",
-        style: GoogleFonts.nunito(
-          fontWeight: FontWeight.w700,
-          color: Colors.black,
+  Widget _buildProfileOption(String title, IconData icon, double screenWidth) {
+    return GestureDetector(
+      onTap: () {
+        title == 'Change Password'
+            ? Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ChangePasswordScreen(),
+              ),
+            )
+            : Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SigninPage1()),
+            );
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Color(0xffD9d9d9)),
         ),
-      ),
-      const TextSpan(text: "any favourites yet."),
-    ],
-  ),
-),
-
-            const SizedBox(height: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
             Text(
-              "Tap on the heart icon on property you like to see them here...",
-              textAlign: TextAlign.center,
+              title,
               style: GoogleFonts.nunito(
-                color: const Color(0xFF787171),
-                fontSize: 14,
+                fontSize: screenWidth * 0.045,
+                fontWeight: FontWeight.w600,
               ),
             ),
+            Icon(icon, size: screenWidth * 0.05, color: Color(0xFF434343)),
           ],
         ),
       ),
@@ -140,7 +175,7 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       color: Colors.white,
-      shadowColor: const Color.fromARGB(255, 93, 91, 91),
+      shadowColor: Color.fromARGB(255, 93, 91, 91),
       notchMargin: 6.0,
       child: SizedBox(
         height: 70,
@@ -157,6 +192,7 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
                     "Home",
                     screenWidth: screenWidth,
                     isActive: activeTab == "Home",
+
                     onTap: () {
                       navigateTo("Home", const HomePage(), context);
                     },
@@ -190,11 +226,11 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
               ),
             ),
             Positioned(
-              bottom: 1,
+              bottom: 1, // Position below the FAB
               child: Text(
                 'Sell',
                 style: GoogleFonts.nunito(
-                  color: const Color(0xFF787171),
+                  color: Color(0xFF787171),
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
@@ -222,11 +258,11 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
             iconPath,
             width: 28,
             height: 28,
-            color: isActive ? const Color(0xFF204ECF) : const Color(0xFFD9D9D9),
+            color: isActive ? Color(0xFF204ECF) : Color(0xFFD9D9D9),
           ),
           Text(
             label,
-            style: GoogleFonts.nunito(color: const Color(0xFF787171), fontSize: 12),
+            style: GoogleFonts.nunito(color: Color(0xFF787171), fontSize: 12),
           ),
         ],
       ),

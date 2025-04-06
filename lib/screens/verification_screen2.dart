@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/homepage.dart';
+import 'package:propconnect/screens/homepage.dart';
 
 class VerificationScreen2 extends StatefulWidget {
   final String firstName;

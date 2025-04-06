@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:propconnect/homepage.dart';
-import 'package:propconnect/favorites_screen.dart';
-import 'package:propconnect/profile_screen1.dart';
+import 'package:propconnect/screens/homepage.dart';
+import 'package:propconnect/screens/favorites_screen.dart';
+import 'package:propconnect/screens/profile_screen1.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ChangePasswordScreen extends StatefulWidget {

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/favorites_screen.dart';
-import 'package:propconnect/homepage.dart';
-import 'package:propconnect/changepassword_screen.dart';
-import 'package:propconnect/signin_page1.dart';
+import 'package:propconnect/screens/favorites_screen.dart';
+import 'package:propconnect/screens/homepage.dart';
+import 'package:propconnect/screens/profile_screen1.dart';
 
-class ProfileScreen1 extends StatefulWidget {
-  const ProfileScreen1({super.key});
+class TrendsScreen1 extends StatefulWidget {
+  const TrendsScreen1({super.key});
 
   @override
-  State<ProfileScreen1> createState() => _ProfileScreen1State();
+  State<TrendsScreen1> createState() => _TrendsScreen1State();
 }
 
-class _ProfileScreen1State extends State<ProfileScreen1> {
-  String activeTab = "Profile";
+class _TrendsScreen1State extends State<TrendsScreen1> {
+  String activeTab = "Trends";
 
   void navigateTo(String tabName, Widget screen, BuildContext context) {
     setState(() {
@@ -46,79 +45,7 @@ class _ProfileScreen1State extends State<ProfileScreen1> {
           ],
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Profile",
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.06,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 5),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Access all your top picks instantly!",
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.04,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
 
-            const SizedBox(height: 20),
-            CircleAvatar(
-              radius: screenWidth * 0.15,
-              backgroundColor: Colors.white,
-              child: Image.asset(
-                "assets/images/profile_img.png",
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              "riyafathimakp38@gmail.com",
-              style: GoogleFonts.nunito(
-                fontSize: screenWidth * 0.045,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              "+919074103337",
-              style: GoogleFonts.nunito(
-                fontSize: screenWidth * 0.04,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 5),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                "Edit Your Profile",
-                style: GoogleFonts.nunito(
-                  color: Color(0xFF204ECF),
-                  fontSize: screenWidth * 0.04,
-                ),
-              ),
-            ),
-            const SizedBox(height: 50),
-            _buildProfileOption(
-              "Change Password",
-              Icons.arrow_forward_ios,
-              screenWidth,
-            ),
-            const SizedBox(height: 10),
-            _buildProfileOption("Logout", Icons.arrow_forward_ios, screenWidth),
-          ],
-        ),
-      ),
       bottomNavigationBar: _buildBottomNavBar(screenWidth),
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
@@ -129,45 +56,6 @@ class _ProfileScreen1State extends State<ProfileScreen1> {
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
-  }
-
-  Widget _buildProfileOption(String title, IconData icon, double screenWidth) {
-    return GestureDetector(
-      onTap: () {
-        title == 'Change Password'
-            ? Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ChangePasswordScreen(),
-              ),
-            )
-            : Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SigninPage1()),
-            );
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-        height: 50,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Color(0xffD9d9d9)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: GoogleFonts.nunito(
-                fontSize: screenWidth * 0.045,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Icon(icon, size: screenWidth * 0.05, color: Color(0xFF434343)),
-          ],
-        ),
-      ),
     );
   }
 
@@ -201,7 +89,10 @@ class _ProfileScreen1State extends State<ProfileScreen1> {
                     "assets/images/trends_icon.png",
                     "Trends",
                     screenWidth: screenWidth,
-                    isActive: false,
+                    isActive: activeTab=="Trends",
+                    onTap: () {
+                      navigateTo("Favorites", const TrendsScreen1(), context);
+                    },
                   ),
                   const SizedBox(width: 40), // Space for FAB
                   _buildNavItem(

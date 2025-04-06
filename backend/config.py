@@ -17,7 +17,7 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key_here')
     
     # Database Configuration
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:propconnect@localhost:5432/propconnect'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:riyapsql@localhost:5432/propconnect'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Flask-Mail Configuration

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:propconnect/signin_page1.dart';
+import 'package:propconnect/screens/signin_page1.dart';
 
 
 class SplashScreen2 extends StatelessWidget {

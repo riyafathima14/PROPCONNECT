@@ -26,3 +26,25 @@ def list_properties():
             'rating': float(prop.rating) if prop.rating is not None else None
         })
     return jsonify(result)
+@property_bp.route('/top-rated', methods=['GET'])
+def top_rated_properties():
+    properties = Property.query.filter(Property.rating >= 4.0).all()
+    result = []
+    for prop in properties:
+        result.append({
+            'id': prop.id,
+            'owner_id': prop.owner_id,
+            'title': prop.title,
+            'property_type': prop.property_type,
+            'location': prop.location,
+            'latitude': float(prop.latitude) if prop.latitude else None,
+            'longitude': float(prop.longitude) if prop.longitude else None,
+            'price': float(prop.price),
+            'size': prop.size,
+            'description': prop.description,
+            'status': prop.status,
+            'created_at': prop.created_at,
+            'imgURL': prop.imgURL.split(",") if prop.imgURL else [],
+            'rating': float(prop.rating) if prop.rating is not None else None
+        })
+    return jsonify(result)

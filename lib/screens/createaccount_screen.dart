@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/signin_page2.dart';
-import 'package:propconnect/verification_screen1.dart';
+import 'package:propconnect/screens/signin_page2.dart';
+import 'package:propconnect/screens/verification_screen1.dart';
 import 'package:crypt/crypt.dart';
 
 class CreateAccountScreen extends StatefulWidget {

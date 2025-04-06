@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/homepage.dart';
+import 'package:propconnect/screens/homepage.dart';
+import 'package:propconnect/services/search_services.dart';
+import 'package:propconnect/screens/propertylisting_screen.dart';
 
 class SearchScreen1 extends StatefulWidget {
   const SearchScreen1({super.key});
@@ -47,6 +49,7 @@ class _SearchScreen1State extends State<SearchScreen1> {
     "Hyderabad": ["Gachibowli", "Banjara Hills", "Madhapur", "Begumpet"],
     "Pune": ["Koregaon Park", "Hinjewadi", "Kothrud", "Wakad"],
   };
+  String? selectedPropertyType;
   String? minBudget;
   String? maxBudget;
   List<String> budgets = ["No Min", "₹5L", "₹10L", "₹20L", "₹50L", "₹1Cr"];
@@ -57,7 +60,20 @@ class _SearchScreen1State extends State<SearchScreen1> {
     {"name": "House/Villa", "image": "assets/images/house.png"},
     {"name": "Plot/Land", "image": "assets/images/plot.png"},
   ];
-  String? selectedPropertyType;
+  
+  int parseBudgetInput(String input) {
+    input = input.replaceAll(' ', '').toUpperCase(); // Clean spaces
+    if (input.endsWith('L')) {
+      int num = int.tryParse(input.replaceAll('L', '')) ?? 0;
+      return num * 100000; // 1 Lakh = 100000
+    } else if (input.endsWith('CR')) {
+      int num = int.tryParse(input.replaceAll('CR', '')) ?? 0;
+      return num * 10000000; // 1 Crore = 1 Crore = 10000000
+    } else {
+      // Assume plain number
+      return int.tryParse(input) ?? 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -252,61 +268,75 @@ class _SearchScreen1State extends State<SearchScreen1> {
                   if (selectedCity != null && selectedLocality != null) ...[
                     // Budget dropdowns
                     Text(
-              "Budget in ₹",
-              style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
+                      "Budget in ₹",
+                      style: GoogleFonts.nunito(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
 
-            /// Budget Dropdowns
-            Row(
-              children: [
-                Expanded(
-                  child: _budgetDropdown("No Min", budgets, (value) {
-                    setState(() {
-                      minBudget = value;
-                    });
-                  }),
-                ),
-                const SizedBox(width: 10),
-                Text("To", style: GoogleFonts.nunito(fontSize: 16)),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _budgetDropdown("No Max", maxBudgets, (value) {
-                    setState(() {
-                      maxBudget = value;
-                    });
-                  }),
-                ),
-              ],
-            ),
+                    /// Budget Dropdowns
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _budgetInput("No MIN", maxBudgets, (value) {
+                            setState(() {
+                              minBudget =
+                                  parseBudgetInput(
+                                    value,
+                                  ).toString(); // 🚀 convert to number
+                            });
+                          }, minBudget?.toString()),
+                        ),
 
-            const SizedBox(height: 20),
+                        const SizedBox(width: 10),
+                        Text("To", style: GoogleFonts.nunito(fontSize: 16)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _budgetInput("No Max", maxBudgets, (value) {
+                            setState(() {
+                              maxBudget =
+                                  parseBudgetInput(
+                                    value,
+                                  ).toString(); // 🚀 convert to number
+                            });
+                          }, maxBudget?.toString()),
+                        ),
+                      ],
+                    ),
 
-            /// Property Types Label
-            Text(
-              "Property types",
-              style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
+                    const SizedBox(height: 20),
 
-            /// Property Type Selection
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: propertyTypes.map((type) {
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedPropertyType = type["name"];
-                      });
-                    },
-                    child: _propertyTypeCard(type["name"]!, type["image"]!, selectedPropertyType == type["name"]),
-                  ),
-                );
-              }).toList(),
-            ),
+                    /// Property Types Label
+                    Text(
+                      "Property types",
+                      style: GoogleFonts.nunito(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                   
+
+                    /// Property Type Selection
+                    GridView.count(
+  crossAxisCount: 3, // 3 cards per row (adjust if needed)
+  // crossAxisSpacing:1,
+  // mainAxisSpacing: 1,
+  childAspectRatio: 1, // 👈 Important for equal width and height
+  shrinkWrap: true,
+  physics: NeverScrollableScrollPhysics(), // Because inside a ScrollView
+  children: propertyTypes.map((property) {
+    return _propertyTypeCard(
+      property['name']!,
+      property['image']!,
+      selectedPropertyType == property['name'], // Pass true/false if selected
+    );
+  }).toList(),
+),
+
                   ],
-                  SizedBox(height: screenSize.height * 0.02),
+                  //SizedBox(height: screenSize.height * 0.02),
                 ],
               ],
             ),
@@ -330,9 +360,12 @@ class _SearchScreen1State extends State<SearchScreen1> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    selectedCity = null;
+                    setState(() {
+                      selectedCity = null;
                     selectedLocality = null;
                     isBuySelected = true;
+                    });
+                    
                   },
                   child: Text(
                     "Clear All",
@@ -353,7 +386,31 @@ class _SearchScreen1State extends State<SearchScreen1> {
                       vertical: screenSize.height * 0.015,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () async {
+  if (selectedCity != null && selectedLocality != null && selectedPropertyType != null) {
+    print("Fetching properties...");
+    final properties = await SearchService.searchProperties(
+      city: selectedCity!,
+      locality: selectedLocality!,
+      minBudget: minBudget,
+      maxBudget: maxBudget,
+      propertyType: selectedPropertyType!,
+      isBuy: isBuySelected,
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PropertyListingScreen(properties: properties),
+      ),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please select City, Locality and Property Type.")),
+    );
+  }
+},
+
                   child: Row(
                     children: [
                       Text(
@@ -492,55 +549,86 @@ class _SearchScreen1State extends State<SearchScreen1> {
     );
   }
 
-  Widget _budgetDropdown(String label, List<String> budgets, Null Function(dynamic value) param2,) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          hint: Text(label, style: GoogleFonts.nunito()),
-          items:
-              [
-                "10 L",
-                "20 L",
-                "30 L",
-                "50 L",
-                "1 Cr",
-              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-          onChanged: (value) {},
-        ),
-      ),
+  Widget _budgetInput(
+    String hint,
+    List<String> options,
+    Function(String) onChanged,
+    String? currentValue,
+  ) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return options;
+        }
+        return options.where(
+          (option) => option.toLowerCase().contains(
+            textEditingValue.text.toLowerCase(),
+          ),
+        );
+      },
+      onSelected: (String selection) {
+        onChanged(selection);
+      },
+      fieldViewBuilder: (
+        BuildContext context,
+        TextEditingController fieldTextEditingController,
+        FocusNode focusNode,
+        VoidCallback onFieldSubmitted,
+      ) {
+        return TextField(
+          controller: fieldTextEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            hintText: hint,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
+          ),
+          keyboardType: TextInputType.text, // allow typing '10 L', '1 Cr'
+          onChanged: (value) {
+            onChanged(value);
+          },
+        );
+      },
     );
   }
 
-  
-   
-
   /// Property Type Card Widget with Asset Images
   Widget _propertyTypeCard(String type, String imagePath, bool isSelected) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.black.withOpacity(0.1) : Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isSelected ? Colors.blue : Colors.grey.shade300),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(imagePath, width: 40, height: 40, fit: BoxFit.contain),
-          const SizedBox(height: 5),
-          Text(
-            type,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.nunito(fontSize: 14, color: Colors.black87),
+     bool isSelected = selectedPropertyType == type;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedPropertyType = type; // Update on tap
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.black.withOpacity(0.1) : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? Color(0xFF204ECF) : Colors.grey.shade300,
           ),
-        ],
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+             mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(imagePath, width: 40, height: 40, fit: BoxFit.contain),
+              const SizedBox(height: 5),
+              Text(
+                type,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.nunito(fontSize: 14, color: Colors.black87),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
