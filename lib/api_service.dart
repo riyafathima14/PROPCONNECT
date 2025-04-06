@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://172.16.12.20:5000'; // Change if needed
+  static const String baseUrl = 'http://192.168.1.3:5000'; // Change if needed
 
   static Future<Map<String, dynamic>> sendOtp({
     required String method,
