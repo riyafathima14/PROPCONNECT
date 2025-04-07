@@ -11,8 +11,8 @@ class VerificationScreen1 extends StatefulWidget {
   final String lastName;
   final String email;
   final String phone;
-  final String username;
   final String encryptedPassword;
+  final String username;
 
   const VerificationScreen1({
     super.key,
@@ -44,10 +44,25 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
     String method = isEmailSelected ? "email" : "phone";
 
     try {
+      print(jsonEncode({
+      "first_name": widget.firstName,
+     "last_name": widget.lastName,
+     "email": widget.email.isNotEmpty ? widget.email : null,
+     "phone": widget.phone.isNotEmpty ? widget.phone : null,
+     "password": widget.encryptedPassword,
+      }));
+
       final response = await http.post(
-        Uri.parse("http://your-backend-ip:5000/api/send-otp"),
+        Uri.parse("http://127.0.0.1:5000/auth/send-otp"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"contact": contactInfo, "method": method}),
+        body: jsonEncode({
+          "first_name": widget.firstName,
+          "last_name": widget.lastName,
+          "email": widget.email,
+          "phone": widget.phone,
+          "user_name": widget.username,
+          "password": widget.encryptedPassword,
+        }),
       );
       if (response.statusCode == 200) {
         print("OTP sent successfully!");
@@ -265,15 +280,19 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
                   }
 
                   // Prepare payload
-                  Map<String, String> requestBody = {
-                    "email": isEmailSelected ? widget.email : "",
-                    "phone": isMobileSelected ? widget.phone : "",
+                  final Map<String, dynamic> requestBody = {
+                    "first_name": widget.firstName,
+                    "last_name": widget.lastName,
+                    "email": widget.email.isNotEmpty ? widget.email : null,
+                    "phone": widget.phone.isNotEmpty ? widget.phone : null,
+                    "user_name": widget.username,
+                    "password": widget.encryptedPassword,
                   };
 
                   try {
                     final response = await http.post(
                       Uri.parse(
-                        "http://your-backend-ip:5000/api/send-otp",
+                        "http://127.0.0.1:5000/auth/send-otp",
                       ), // Replace with your Flask backend IP
                       headers: {"Content-Type": "application/json"},
                       body: jsonEncode(requestBody),

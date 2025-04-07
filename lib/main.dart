@@ -5,12 +5,22 @@ import 'package:provider/provider.dart';
 import 'package:propconnect/providers/favorite_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
+<<<<<<< HEAD
 // import 'package:propconnect/createaccount_screen.dart';
 import 'package:propconnect/screens/homepage.dart';
 import 'package:propconnect/screens/splash_screen.dart';
 // import 'package:propconnect/search_screen1.dart';
 // import 'package:propconnect/signin_page1.dart';
 // import 'package:propconnect/splash_screen.dart';
+=======
+import 'package:propconnect/homepage.dart';
+
+import 'package:propconnect/createaccount_screen.dart';
+
+import 'package:propconnect/search_screen1.dart';
+import 'package:propconnect/signin_page1.dart';
+import 'package:propconnect/splash_screen.dart';
+>>>>>>> 21cfef73cc1af80d997592547894e284519365f5
 
 
 void main() {
@@ -45,7 +55,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> checkBackendConnection() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.3:5000/'));
+      final response = await http.get(Uri.parse('http://127.0.0.1:5000/'));
 
       if (response.statusCode == 200) {
         print("✅ Flask Backend Connected: ${jsonDecode(response.body)}");
@@ -66,6 +76,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return MultiProvider(
        providers: [
         // Register your providers here
@@ -80,6 +91,16 @@ class _MyAppState extends State<MyApp> {
                 ? const HomePage() // Proceed if backend is connected
                 : const ErrorScreen(), // Show an error screen if connection fails
       ),
+=======
+    return MaterialApp(
+      builder: DevicePreview.appBuilder,
+      debugShowCheckedModeBanner: false,
+      home: isLoading
+          ? const Center(child: CircularProgressIndicator()) // Show loading indicator while checking connection
+          : isBackendConnected
+              ? const SplashScreen() // Proceed if backend is connected
+              : const ErrorScreen(), // Show an error screen if connection fails
+>>>>>>> 21cfef73cc1af80d997592547894e284519365f5
     );
   }
 }
