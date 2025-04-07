@@ -1,4 +1,5 @@
 # routes/property_routes.py
+from models.user import User
 from flask import Blueprint, jsonify, request  
 from models.property import Property
 
@@ -160,3 +161,32 @@ def trending_properties():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@property_bp.route('/<int:property_id>', methods=['GET'])
+def get_property(property_id):
+    prop = Property.query.get(property_id)
+    if not prop:
+        return jsonify({'error': 'Property not found'}), 404
+
+    owner = User.query.get(prop.owner_id)
+    owner_name = f"{owner.first_name} {owner.last_name}" if owner else None
+
+    result = {
+        'id': prop.id,
+        'owner_id': prop.owner_id,
+        'owner_name': owner_name,
+        'owner_contact': owner.phone if owner else None,
+        'title': prop.title,
+        'property_type': prop.property_type,
+        'location': prop.location,
+        'latitude': float(prop.latitude) if prop.latitude else None,
+        'longitude': float(prop.longitude) if prop.longitude else None,
+        'price': float(prop.price),
+        'size': prop.size,
+        'description': prop.description,
+        'status': prop.status,
+        'created_at': prop.created_at,
+        'imgURL': prop.imgURL.split(",") if prop.imgURL else [],
+        'rating': float(prop.rating) if prop.rating is not None else None
+    }
+    return jsonify(result)

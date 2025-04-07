@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/providers/favorite_provider.dart';
+import 'package:propconnect/screens/property_details_screen.dart';
 import 'package:propconnect/screens/trends_screen1.dart';
-import 'package:propconnect/services/property.dart';
+import 'package:propconnect/models/property.dart';
 import 'package:propconnect/screens/favorites_screen.dart';
 import 'package:propconnect/screens/recommendatio_screen.dart';
 import 'package:propconnect/screens/profile_screen1.dart';
@@ -10,6 +11,7 @@ import 'package:propconnect/screens/search_screen1.dart';
 import 'package:propconnect/widgets/property_card_wiget.dart';
 import 'package:propconnect/widgets/review_section.dart';
 import 'package:provider/provider.dart';
+import 'package:propconnect/services/top_rated_services.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,11 +30,11 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
 
-  late Future<List<Property>> _futureProperties;
+  late Future<List<PropertyBasic>> _futureProperties;
   @override
   void initState() {
     super.initState();
-    _futureProperties = fetchTopRatedProperties(); // <-- only once
+    _futureProperties = TopRatedServices.fetchTopRatedProperties(); // <-- only once
   }
 
   @override
@@ -260,7 +262,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                     FutureBuilder<List<Property>>(
+                     FutureBuilder<List<PropertyBasic>>(
                 future: _futureProperties,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -287,26 +289,39 @@ class _HomePageState extends State<HomePage> {
                               property.id.toString(),
                             );
 
-                            return buildPropertyCard(
-                              property: property,
-                              isFavorite: isFavorite,
-                              onFavoriteToggle: () {
-                                final favoriteProperty = FavoriteProperty(
-                                  id: property.id.toString(),
-                                  title: property.title,
-                                  price: property.price,
-                                  rating: property.rating,
-                                  location: property.location,
-                                  imgURL:
-                                      property.imgURL.isNotEmpty
-                                          ? property.imgURL[0]
-                                          : '',
-                                );
-
-                                favoriteProvider.toggleFavorite(
-                                  favoriteProperty,
+                            return GestureDetector(
+                               onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => PropertyDetailScreen(
+                                         propertyId: property.id,
+                                        ),
+                                  ),
                                 );
                               },
+                              child: buildPropertyCard(
+                                property: property,
+                                isFavorite: isFavorite,
+                                onFavoriteToggle: () {
+                                  final favoriteProperty = FavoriteProperty(
+                                    id: property.id.toString(),
+                                    title: property.title,
+                                    price: property.price,
+                                    rating: property.rating,
+                                    location: property.location,
+                                    imgURL:
+                                        property.imgURL.isNotEmpty
+                                            ? property.imgURL[0]
+                                            : '',
+                                  );
+                              
+                                  favoriteProvider.toggleFavorite(
+                                    favoriteProperty,
+                                  );
+                                },
+                              ),
                             );
                           },
                         );

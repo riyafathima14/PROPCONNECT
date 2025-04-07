@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/providers/favorite_provider.dart';
 import 'package:propconnect/screens/homepage.dart';
 import 'package:propconnect/screens/profile_screen1.dart';
+import 'package:propconnect/screens/property_details_screen.dart';
 import 'package:propconnect/screens/trends_screen1.dart';
 import 'package:provider/provider.dart';
 
@@ -86,14 +87,29 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
                 itemCount: favorites.length,
                 itemBuilder: (context, index) {
                   final property = favorites[index];
-                  return buildFavoritePropertyCard(
-                    property: property,
-                    onFavoriteToggle: () {
-                      Provider.of<FavoriteProvider>(
+                  return GestureDetector(
+                    onTap: () {
+                      
+
+                      Navigator.push(
                         context,
-                        listen: false,
-                      ).removeFavorite(property.id);
+                        MaterialPageRoute(
+                          builder:
+                              (context) => PropertyDetailScreen(
+                                propertyId: int.parse(property.id),
+                              ),
+                        ),
+                      );
                     },
+                    child: buildFavoritePropertyCard(
+                      property: property,
+                      onFavoriteToggle: () {
+                        Provider.of<FavoriteProvider>(
+                          context,
+                          listen: false,
+                        ).removeFavorite(property.id);
+                      },
+                    ),
                   );
                 },
               ),
@@ -185,14 +201,13 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
                     },
                   ),
                   _buildNavItem(
-                        "assets/images/trends_icon.png",
-                        "Trends",
-                        isActive: activeTab == "Trends",
-                        onTap: () {
-                          navigateTo("Trends", const TrendsScreen1(), context);
-                        },
-                      
-                      ),
+                    "assets/images/trends_icon.png",
+                    "Trends",
+                    isActive: activeTab == "Trends",
+                    onTap: () {
+                      navigateTo("Trends", const TrendsScreen1(), context);
+                    },
+                  ),
                   const SizedBox(width: 40), // Space for FAB
                   _buildNavItem(
                     "assets/images/favorites_icon.png",

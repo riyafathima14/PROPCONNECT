@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/screens/homepage.dart';
-import 'package:propconnect/services/property.dart';
+import 'package:propconnect/screens/property_details_screen.dart';
+import 'package:propconnect/models/property.dart';
+import 'package:propconnect/services/top_rated_services.dart';
 import 'package:propconnect/widgets/property_card_wiget.dart';
 import 'package:provider/provider.dart'; //
-import 'package:propconnect/providers/favorite_provider.dart'; // <-- Your new favorite provider
-
+import 'package:propconnect/providers/favorite_provider.dart'; 
 class RecommendatioScreen extends StatefulWidget {
   const RecommendatioScreen({super.key});
 
@@ -14,11 +15,11 @@ class RecommendatioScreen extends StatefulWidget {
 }
 
 class _RecommendatioScreenState extends State<RecommendatioScreen> {
-  late Future<List<Property>> _futureProperties;
+  late Future<List<PropertyBasic>> _futureProperties;
   @override
   void initState() {
     super.initState();
-    _futureProperties =fetchTopRatedProperties(); // <-- only once
+    _futureProperties = TopRatedServices.fetchTopRatedProperties(); 
   }
 
   @override
@@ -99,7 +100,7 @@ class _RecommendatioScreenState extends State<RecommendatioScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              FutureBuilder<List<Property>>(
+              FutureBuilder<List<PropertyBasic>>(
                 future: _futureProperties,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -126,26 +127,39 @@ class _RecommendatioScreenState extends State<RecommendatioScreen> {
                               property.id.toString(),
                             );
 
-                            return buildPropertyCard(
-                              property: property,
-                              isFavorite: isFavorite,
-                              onFavoriteToggle: () {
-                                final favoriteProperty = FavoriteProperty(
-                                  id: property.id.toString(),
-                                  title: property.title,
-                                  price: property.price,
-                                  rating: property.rating,
-                                  location: property.location,
-                                  imgURL:
-                                      property.imgURL.isNotEmpty
-                                          ? property.imgURL[0]
-                                          : '',
-                                );
-
-                                favoriteProvider.toggleFavorite(
-                                  favoriteProperty,
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => PropertyDetailScreen(
+                                          propertyId: property.id,
+                                        ),
+                                  ),
                                 );
                               },
+                              child: buildPropertyCard(
+                                property: property,
+                                isFavorite: isFavorite,
+                                onFavoriteToggle: () {
+                                  final favoriteProperty = FavoriteProperty(
+                                    id: property.id.toString(),
+                                    title: property.title,
+                                    price: property.price,
+                                    rating: property.rating,
+                                    location: property.location,
+                                    imgURL:
+                                        property.imgURL.isNotEmpty
+                                            ? property.imgURL[0]
+                                            : '',
+                                  );
+
+                                  favoriteProvider.toggleFavorite(
+                                    favoriteProperty,
+                                  );
+                                },
+                              ),
                             );
                           },
                         );
@@ -164,7 +178,4 @@ class _RecommendatioScreenState extends State<RecommendatioScreen> {
       ),
     );
   }
-
-  
 }
-

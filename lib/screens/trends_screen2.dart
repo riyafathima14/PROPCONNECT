@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/providers/favorite_provider.dart';
-import 'package:propconnect/services/property.dart';
+import 'package:propconnect/screens/property_details_screen.dart';
+import 'package:propconnect/models/property.dart';
 import 'package:propconnect/widgets/property_card_wiget.dart';
 import 'package:provider/provider.dart';
 import '../services/trends_service.dart';
@@ -72,31 +73,44 @@ class _TrendsScreen2State extends State<TrendsScreen2> {
                         const NeverScrollableScrollPhysics(), // because you already have SingleChildScrollView
                     itemCount: properties.length,
                     itemBuilder: (context, index) {
-                      final property = Property.fromJson(properties[index]);
+                      final property = PropertyBasic.fromJson(properties[index]);
                       return Consumer<FavoriteProvider>(
                         builder: (context, favoriteProvider, child) {
                           final isFavorite = favoriteProvider.isFavorite(
                             property.id.toString(),
                           );
             
-                          return buildPropertyCard(
-                            property: property,
-                            isFavorite: isFavorite,
-                            onFavoriteToggle: () {
-                              final favoriteProperty = FavoriteProperty(
-                                id: property.id.toString(),
-                                title: property.title,
-                                price: property.price,
-                                rating: property.rating,
-                                location: property.location,
-                                imgURL:
-                                    property.imgURL.isNotEmpty
-                                        ? property.imgURL[0]
-                                        : '',
-                              );
-            
-                              favoriteProvider.toggleFavorite(favoriteProperty);
-                            },
+                          return GestureDetector(
+                             onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => PropertyDetailScreen(
+                                          propertyId: property.id,
+                                        ),
+                                  ),
+                                );
+                              },
+                            child: buildPropertyCard(
+                              property: property,
+                              isFavorite: isFavorite,
+                              onFavoriteToggle: () {
+                                final favoriteProperty = FavoriteProperty(
+                                  id: property.id.toString(),
+                                  title: property.title,
+                                  price: property.price,
+                                  rating: property.rating,
+                                  location: property.location,
+                                  imgURL:
+                                      property.imgURL.isNotEmpty
+                                          ? property.imgURL[0]
+                                          : '',
+                                );
+                                        
+                                favoriteProvider.toggleFavorite(favoriteProperty);
+                              },
+                            ),
                           );
                         },
                       );

@@ -42,6 +42,8 @@ dependencies:
   encrypt: ^5.0.3
   crypt: ^4.3.1
   provider: ^6.1.4
+  google_maps_flutter: ^2.5.0
+  geolocator: ^11.0.0
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +98,11 @@ flutter:
    - assets/images/flat.png
    - assets/images/msg_icon.png
    - assets/images/message.png
+   - assets/images/sqft_img.png
+   - assets/images/rating.png
+   - assets/images/feedback_img1.png
+   - assets/images/feedback_img2.png
+   - assets/images/feedback_img3.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

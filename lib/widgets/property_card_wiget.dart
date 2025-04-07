@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:propconnect/services/property.dart';
+import 'package:propconnect/models/property.dart';
 
 
 
 Widget buildPropertyCard({
-    required Property property,
+    required PropertyBasic property,
     required bool isFavorite,
     required VoidCallback onFavoriteToggle,
   }) {
