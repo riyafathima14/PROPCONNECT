@@ -12,7 +12,8 @@ def is_valid_email(email):
     return re.match(email_regex, email)
 
 def is_valid_phone(phone):
-    return phone.startswith("+") and len(phone) >= 10
+    phone = phone.strip()
+    return bool(re.match(r'^(\+91)?[6-9]\d{9}$',phone))
 
 def send_sms_otp(phone, otp):
     try:
