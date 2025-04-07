@@ -74,7 +74,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   "Phone Number", phoneController, screenHeight,
                   validator: _validatePhoneNumber),
               SizedBox(height: screenHeight * 0.01),
-              _buildLabeledTextField("Username", usernameController, screenHeight),
+              _buildLabeledTextField("Username", usernameController, screenHeight, validator: _validateUsername),
               SizedBox(height: screenHeight * 0.01),
               _buildLabeledTextField("Password", passwordController, screenHeight,
                   isPassword: true),
@@ -118,17 +118,21 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   String encryptedPassword = encryptPassword(
                     passwordController.text,
                   );
+                  print('First Name: ${firstNameController.text}');
+                  print('Last Name: ${lastNameController.text}');
+                  print('Password: $encryptedPassword');
+
                   Navigator.pushReplacement(
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) =>
                           VerificationScreen1(
-                        firstName: firstNameController.text,
-                        lastName: lastNameController.text,
-                        email: emailController.text,
-                        phone: phoneController.text,
-                        username: usernameController.text,
-                        encryptedPassword: encryptedPassword,
+                        firstName: firstNameController.text.trim(),
+                        lastName: lastNameController.text.trim(),
+                        email: emailController.text.trim(),
+                        phone: phoneController.text.trim(),
+                        encryptedPassword: encryptedPassword.trim(),
+                        username: usernameController.text.trim(),
                       ),
                       transitionsBuilder: (context, animation, secondaryAnimation, child) {
                         return FadeTransition(
@@ -272,6 +276,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   String? _validateConfirmPassword(String? value) {
     if (value != passwordController.text) return "Passwords do not match";
+    return null;
+  }
+
+  String? _validateUsername(String? value) {
+    if (value == null || value.isEmpty) return "Username is required";
+    if (value.length < 3) return "Username must be atleast 3 characters";
     return null;
   }
 

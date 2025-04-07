@@ -17,6 +17,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))  # Use timezone-aware datetime
     otp = db.Column(db.String(6), nullable=True)  # OTP for verification
     is_verified = db.Column(db.Boolean, default=False)  # Verification status
+    user_name = db.Column(db.String(100), unique=True, nullable=False)
 
 
 # Property Table

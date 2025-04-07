@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/homepage.dart';
 import 'package:propconnect/signin_page1.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SigninPage2 extends StatefulWidget {
   const SigninPage2({super.key});
@@ -12,6 +16,8 @@ class SigninPage2 extends StatefulWidget {
 
 class _SigninPage2State extends State<SigninPage2> {
   bool _isPasswordVisible = false;
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +81,7 @@ class _SigninPage2State extends State<SigninPage2> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        _buildTextField("Username", Icons.person),
+                        _buildTextField("Username", Icons.person, usernameController),
                         const SizedBox(height: 15),
                         _buildPasswordField(),
                       ],
@@ -100,8 +106,60 @@ class _SigninPage2State extends State<SigninPage2> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    onPressed: () {
+                    /*onPressed: () {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context )=> HomePage()));
+                    },*/
+                    onPressed: () async {
+                      final userName = usernameController.text.trim();
+                      final password = passwordController.text;
+
+                      if (userName.isEmpty || password.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Please enter username and password")),
+                        );
+                        return;
+                      }
+
+                      final url = Uri.parse("http://127.0.0.1:5000/auth/login");
+
+                      try {
+                        final response = await http.post(
+                          url,
+                          headers: {"Content-Type": "application/json"},
+                          body: jsonEncode({
+                            "user_name": userName,
+                            "password": password,
+                          }),
+                        );
+
+                        print("Response status: ${response.statusCode}");
+                        print("Response body: ${response.body}");
+
+                        
+
+                        if (response.statusCode == 200 )  {
+                          // Navigate to homepage
+                          final jsonResponse = jsonDecode(response.body);
+                          if(jsonResponse['success'] == true){
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) => HomePage()),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(jsonResponse['message'] ?? "Login failed")),
+                          );
+                        }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Server error: ${response.statusCode}")),
+                          );
+                        }
+                      } catch (e) {
+                        print("Error: $e");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("An error occurred during login")),
+                        );
+                      }
                     },
                     child: Text(
                       "Sign in",
@@ -121,7 +179,7 @@ class _SigninPage2State extends State<SigninPage2> {
     );
   }
 
-  Widget _buildTextField(String hintText, IconData icon) {
+  Widget _buildTextField(String hintText, IconData icon, TextEditingController controller) {
     return TextField(
       style: GoogleFonts.nunito(
         fontSize: 16,
@@ -155,6 +213,7 @@ class _SigninPage2State extends State<SigninPage2> {
 
   Widget _buildPasswordField() {
     return TextField(
+      controller:  passwordController,
       obscureText: !_isPasswordVisible,
       style: GoogleFonts.nunito(
         fontSize: 16,

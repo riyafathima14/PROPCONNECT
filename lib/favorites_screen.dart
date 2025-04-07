@@ -110,7 +110,7 @@ class _FavoriteScreen1State extends State<FavoritesScreen> {
     ),
     children: [
       TextSpan(
-        text: "You haven’t added\n",
+        text: "You haven't added\n",
         style: GoogleFonts.nunito(
           fontWeight: FontWeight.w700,
           color: Colors.black,
