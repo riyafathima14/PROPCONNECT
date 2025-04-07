@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:propconnect/providers/favorite_provider.dart';
+import 'package:propconnect/screens/trends_screen1.dart';
 import 'package:propconnect/services/property.dart';
 import 'package:propconnect/screens/favorites_screen.dart';
 import 'package:propconnect/screens/recommendatio_screen.dart';
 import 'package:propconnect/screens/profile_screen1.dart';
 import 'package:propconnect/screens/search_screen1.dart';
+import 'package:propconnect/widgets/property_card_wiget.dart';
 import 'package:propconnect/widgets/review_section.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -78,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  const SearchScreen1(),
+                                  SearchScreen1(selectedOption: 'buy'),
                           transitionsBuilder: (
                             context,
                             animation,
@@ -193,18 +197,34 @@ class _HomePageState extends State<HomePage> {
                                   "Buy",
                                   optionSize,
                                   textSize,
+                                  () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchScreen1(selectedOption: 'buy'),
+          ),
+        );
+      },
                                 ),
                                 _buildOption(
                                   "assets/images/sellicon.png",
                                   "Sell",
                                   optionSize,
-                                  textSize,
+                                  textSize,(){}
                                 ),
                                 _buildOption(
                                   "assets/images/renticon.png",
                                   "Rent/Pg",
                                   optionSize,
                                   textSize,
+                                  () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchScreen1(selectedOption: 'rent'),
+          ),
+        );
+      },
                                 ),
                               ],
                             ),
@@ -240,41 +260,65 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    FutureBuilder<List<Property>>(
-                      future: _futureProperties,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text('Error: ${snapshot.error}'),
-                          );
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return const Center(
-                            child: Text('No top-rated properties found.'),
-                          );
-                        } else if (snapshot.hasData) {
-                          final properties = snapshot.data!;
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: properties.length,
-                            itemBuilder: (context, index) {
-                              final property = properties[index];
-                              return buildPropertyCard(property);
-                            },
-                          );
-                        }
-                        // If none of the above conditions match, throw an exception.
-                        throw Exception(
-                          'Unexpected snapshot state: ${snapshot.connectionState}',
+                     FutureBuilder<List<Property>>(
+                future: _futureProperties,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text('No top-rated properties found.'),
+                    );
+                  } else if (snapshot.hasData) {
+                    final properties = snapshot.data!;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics:
+                          const NeverScrollableScrollPhysics(), // because you already have SingleChildScrollView
+                      itemCount: properties.length,
+                      itemBuilder: (context, index) {
+                        final property = properties[index];
+
+                        return Consumer<FavoriteProvider>(
+                          builder: (context, favoriteProvider, child) {
+                            final isFavorite = favoriteProvider.isFavorite(
+                              property.id.toString(),
+                            );
+
+                            return buildPropertyCard(
+                              property: property,
+                              isFavorite: isFavorite,
+                              onFavoriteToggle: () {
+                                final favoriteProperty = FavoriteProperty(
+                                  id: property.id.toString(),
+                                  title: property.title,
+                                  price: property.price,
+                                  rating: property.rating,
+                                  location: property.location,
+                                  imgURL:
+                                      property.imgURL.isNotEmpty
+                                          ? property.imgURL[0]
+                                          : '',
+                                );
+
+                                favoriteProvider.toggleFavorite(
+                                  favoriteProperty,
+                                );
+                              },
+                            );
+                          },
                         );
                       },
-                    ),
+                    );
+                  }
+                  // If none of the above conditions match, throw an exception.
+                  throw Exception(
+                    'Unexpected snapshot state: ${snapshot.connectionState}',
+                  );
+                },
+              ),
                     const SizedBox(height: 10,),
                     ReviewsSection(),
                   ],
@@ -310,7 +354,11 @@ class _HomePageState extends State<HomePage> {
                       _buildNavItem(
                         "assets/images/trends_icon.png",
                         "Trends",
-                        isActive: false,
+                        isActive: activeTab == "Trends",
+                        onTap: () {
+                          navigateTo("Trends", const TrendsScreen1(), context);
+                        },
+                      
                       ),
                       const SizedBox(width: 40), // Space for FAB
                       _buildNavItem(
@@ -367,125 +415,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildPropertyCard(Property property) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top part: Property Image with Favorites Icon
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-                child: Image.network(
-                  property.imgURL.isNotEmpty
-                      ? property.imgURL[0]
-                      : 'https://via.placeholder.com/150',
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.favorite_border, color: Color(0xFF204ECF)),
-                ),
-              ),
-            ],
-          ),
-          // Bottom part: Property Details
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Property Title
-                Text(
-                  property.title,
-                  style: GoogleFonts.nunito(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // Location and Price
-                Text(
-                  '${property.location} • ₹${property.price.toStringAsFixed(0)}',
-                  style: GoogleFonts.nunito(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // Row with Rating and Interested Container
-                Row(
-                  children: [
-                    // Rating Container
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF204ECF),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '${property.rating} ⭐',
-                        style: GoogleFonts.nunito(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    // Interested Container with WhatsApp and Phone Icons
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xFF204ECF)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: 
-                          Text(
-                            'Interested',
-                            style: GoogleFonts.nunito(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                        
-                      ),
-                    ),
-                    const SizedBox(width: 8,),
-                    SizedBox(height: 45,width: 45,child: Image.asset('assets/images/msg_icon.png'),),
-                    const SizedBox(width: 8,),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 Widget _buildNavItem(
@@ -516,50 +445,54 @@ Widget _buildOption(
   String label,
   double size,
   double textSize,
+  VoidCallback onTap,
 ) {
-  return Column(
-    children: [
-      Container(
-        width: size,
-        height: size * 1.1258,
-        padding: EdgeInsets.all(size * 0.1),
-        decoration: BoxDecoration(
-          color: Color(0xFFE6F0FF),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Color(0xFFDADADA), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade200,
-              blurRadius: 5,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              height: size * 0.7,
-              width: size * 0.7,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
+  return GestureDetector(
+    onTap: onTap,
+    child: Column(
+      children: [
+        Container(
+          width: size,
+          height: size * 1.1258,
+          padding: EdgeInsets.all(size * 0.1),
+          decoration: BoxDecoration(
+            color: Color(0xFFE6F0FF),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Color(0xFFDADADA), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade200,
+                blurRadius: 5,
+                spreadRadius: 1,
               ),
-              child: Center(child: Image.asset(imagePath, height: size * 0.5)),
-            ),
-            Text(
-              label,
-              style: GoogleFonts.nunito(
-                fontSize: textSize,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: size * 0.7,
+                width: size * 0.7,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(child: Image.asset(imagePath, height: size * 0.5)),
               ),
-            ),
-          ],
+              Text(
+                label,
+                style: GoogleFonts.nunito(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      SizedBox(height: size * 0.08),
-    ],
+        SizedBox(height: size * 0.08),
+      ],
+    ),
   );
 }
 

@@ -3,19 +3,18 @@ import 'package:http/http.dart' as http;
 
 class SearchService {
   static Future<List<dynamic>> searchProperties({
-    required String city,
+    
     required String locality,
     String? minBudget,
     String? maxBudget,
-    String? propertyType,
+    List<String>? propertyTypes,
     required bool isBuy, // 🔥 Added isBuy
   }) async {
     try {
-      final uri = Uri.parse('http://192.168.1.3:5000/search_properties');
+      final uri = Uri.parse('http://192.168.1.3:5000/properties/search_properties');
 
       Map<String, dynamic> body = {
-        'city': city,
-        'locality': locality,
+        'location': locality,
         'is_buy': isBuy, // 🔥 Added is_buy field
       };
 
@@ -28,9 +27,10 @@ class SearchService {
       }
 
       // Add property type if selected
-      if (propertyType != null && propertyType.isNotEmpty) {
-        body['property_type'] = propertyType;
-      }
+      if (propertyTypes != null && propertyTypes.isNotEmpty) {
+  body['property_types'] = propertyTypes;  
+}
+
 
       final response = await http.post(
         uri,

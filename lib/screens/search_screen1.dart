@@ -5,14 +5,27 @@ import 'package:propconnect/services/search_services.dart';
 import 'package:propconnect/screens/propertylisting_screen.dart';
 
 class SearchScreen1 extends StatefulWidget {
-  const SearchScreen1({super.key});
+  final String selectedOption;
+  const SearchScreen1({super.key, required this.selectedOption});
 
   @override
   State<SearchScreen1> createState() => _SearchScreen1State();
 }
 
 class _SearchScreen1State extends State<SearchScreen1> {
-  bool isBuySelected = true; // true = Buy, false = Rent/PG
+  late bool isBuySelected; // true = Buy, false = Rent/PG
+  List<String> mapUIToDBPropertyTypes(String selectedUIType) {
+    switch (selectedUIType) {
+      case 'Flat/Apartment':
+        return ['Apartment'];
+      case 'House/Villa':
+        return ['Independent Villa', 'Independent House', 'PG/Co-Living'];
+      case 'Plot/Land':
+        return ['Agricultural Land'];
+      default:
+        return [];
+    }
+  }
 
   String? selectedCity;
   String? selectedLocality;
@@ -60,7 +73,7 @@ class _SearchScreen1State extends State<SearchScreen1> {
     {"name": "House/Villa", "image": "assets/images/house.png"},
     {"name": "Plot/Land", "image": "assets/images/plot.png"},
   ];
-  
+
   int parseBudgetInput(String input) {
     input = input.replaceAll(' ', '').toUpperCase(); // Clean spaces
     if (input.endsWith('L')) {
@@ -73,6 +86,14 @@ class _SearchScreen1State extends State<SearchScreen1> {
       // Assume plain number
       return int.tryParse(input) ?? 0;
     }
+  }
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    isBuySelected = widget.selectedOption == 'buy';  // set from incoming parameter
   }
 
   @override
@@ -105,10 +126,33 @@ class _SearchScreen1State extends State<SearchScreen1> {
                         ),
                         child: Row(
                           children: [
-                            _toggleButton("Buy", isSelected: isBuySelected),
-                            _toggleButton(
-                              "Rent/PG",
-                              isSelected: !isBuySelected,
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isBuySelected = true;
+                                  selectedCity = null;
+                                  selectedLocality = null;
+                                  selectedPropertyType = null;
+                                });
+                              },
+                              child: _toggleButton(
+                                "Buy",
+                                isSelected: isBuySelected,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isBuySelected = false;
+                                  selectedCity = null;
+                                  selectedLocality = null;
+                                  selectedPropertyType = null;
+                                });
+                              },
+                              child: _toggleButton(
+                                "Rent/PG",
+                                isSelected: !isBuySelected,
+                              ),
                             ),
                           ],
                         ),
@@ -280,12 +324,9 @@ class _SearchScreen1State extends State<SearchScreen1> {
                     Row(
                       children: [
                         Expanded(
-                          child: _budgetInput("No MIN", maxBudgets, (value) {
+                          child: _budgetInput("No MIN", budgets, (value) {
                             setState(() {
-                              minBudget =
-                                  parseBudgetInput(
-                                    value,
-                                  ).toString(); // 🚀 convert to number
+                              minBudget = parseBudgetInput(value).toString();
                             });
                           }, minBudget?.toString()),
                         ),
@@ -316,25 +357,27 @@ class _SearchScreen1State extends State<SearchScreen1> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                   
 
                     /// Property Type Selection
                     GridView.count(
-  crossAxisCount: 3, // 3 cards per row (adjust if needed)
-  // crossAxisSpacing:1,
-  // mainAxisSpacing: 1,
-  childAspectRatio: 1, // 👈 Important for equal width and height
-  shrinkWrap: true,
-  physics: NeverScrollableScrollPhysics(), // Because inside a ScrollView
-  children: propertyTypes.map((property) {
-    return _propertyTypeCard(
-      property['name']!,
-      property['image']!,
-      selectedPropertyType == property['name'], // Pass true/false if selected
-    );
-  }).toList(),
-),
-
+                      crossAxisCount: 3, // 3 cards per row (adjust if needed)
+                      // crossAxisSpacing:1,
+                      // mainAxisSpacing: 1,
+                      childAspectRatio:
+                          1, // 👈 Important for equal width and height
+                      shrinkWrap: true,
+                      physics:
+                          NeverScrollableScrollPhysics(), // Because inside a ScrollView
+                      children:
+                          propertyTypes.map((property) {
+                            return _propertyTypeCard(
+                              property['name']!,
+                              property['image']!,
+                              selectedPropertyType ==
+                                  property['name'], // Pass true/false if selected
+                            );
+                          }).toList(),
+                    ),
                   ],
                   //SizedBox(height: screenSize.height * 0.02),
                 ],
@@ -362,10 +405,10 @@ class _SearchScreen1State extends State<SearchScreen1> {
                   onTap: () {
                     setState(() {
                       selectedCity = null;
-                    selectedLocality = null;
-                    isBuySelected = true;
+                      selectedLocality = null;
+                      isBuySelected = true;
+                      selectedPropertyType = null;
                     });
-                    
                   },
                   child: Text(
                     "Clear All",
@@ -387,29 +430,41 @@ class _SearchScreen1State extends State<SearchScreen1> {
                     ),
                   ),
                   onPressed: () async {
-  if (selectedCity != null && selectedLocality != null && selectedPropertyType != null) {
-    print("Fetching properties...");
-    final properties = await SearchService.searchProperties(
-      city: selectedCity!,
-      locality: selectedLocality!,
-      minBudget: minBudget,
-      maxBudget: maxBudget,
-      propertyType: selectedPropertyType!,
-      isBuy: isBuySelected,
-    );
+                    if (selectedCity != null &&
+                        selectedLocality != null &&
+                        selectedPropertyType != null) {
+                      print("Fetching properties...");
+                      final mappedPropertyTypes = mapUIToDBPropertyTypes(
+                        selectedPropertyType!,
+                      );
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PropertyListingScreen(properties: properties),
-      ),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Please select City, Locality and Property Type.")),
-    );
-  }
-},
+                      final properties = await SearchService.searchProperties(
+                        locality: selectedLocality!,
+                        minBudget: minBudget,
+                        maxBudget: maxBudget,
+                        propertyTypes:
+                            mappedPropertyTypes, // Notice it's a List<String> now
+                        isBuy: isBuySelected,
+                      );
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  PropertyListingScreen(properties: properties),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Please select City, Locality and Property Type.",
+                          ),
+                        ),
+                      );
+                    }
+                  },
 
                   child: Row(
                     children: [
@@ -434,25 +489,18 @@ class _SearchScreen1State extends State<SearchScreen1> {
   }
 
   Widget _toggleButton(String text, {required bool isSelected}) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          isBuySelected = (text == "Buy");
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.black : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          text,
-          style: GoogleFonts.nunito(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : Colors.black,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.black : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.nunito(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: isSelected ? Colors.white : Colors.black,
         ),
       ),
     );
@@ -597,7 +645,7 @@ class _SearchScreen1State extends State<SearchScreen1> {
 
   /// Property Type Card Widget with Asset Images
   Widget _propertyTypeCard(String type, String imagePath, bool isSelected) {
-     bool isSelected = selectedPropertyType == type;
+    bool isSelected = selectedPropertyType == type;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -617,9 +665,14 @@ class _SearchScreen1State extends State<SearchScreen1> {
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(imagePath, width: 40, height: 40, fit: BoxFit.contain),
+              Image.asset(
+                imagePath,
+                width: 40,
+                height: 40,
+                fit: BoxFit.contain,
+              ),
               const SizedBox(height: 5),
               Text(
                 type,

@@ -4,6 +4,7 @@ import 'package:propconnect/screens/favorites_screen.dart';
 import 'package:propconnect/screens/homepage.dart';
 import 'package:propconnect/screens/changepassword_screen.dart';
 import 'package:propconnect/screens/signin_page1.dart';
+import 'package:propconnect/screens/trends_screen1.dart';
 
 class ProfileScreen1 extends StatefulWidget {
   const ProfileScreen1({super.key});
@@ -197,12 +198,15 @@ class _ProfileScreen1State extends State<ProfileScreen1> {
                       navigateTo("Home", const HomePage(), context);
                     },
                   ),
-                  _buildNavItem(
-                    "assets/images/trends_icon.png",
-                    "Trends",
-                    screenWidth: screenWidth,
-                    isActive: false,
-                  ),
+                   _buildNavItem(
+                        "assets/images/trends_icon.png",
+                        "Trends",
+                        isActive: activeTab == "Trends",
+                        onTap: () {
+                          navigateTo("Trends", const TrendsScreen1(), context);
+                        },
+                      
+                      ),
                   const SizedBox(width: 40), // Space for FAB
                   _buildNavItem(
                     "assets/images/favorites_icon.png",

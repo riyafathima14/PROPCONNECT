@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/screens/favorites_screen.dart';
 import 'package:propconnect/screens/homepage.dart';
 import 'package:propconnect/screens/profile_screen1.dart';
+import 'package:propconnect/screens/trends_screen2.dart';
 
 class TrendsScreen1 extends StatefulWidget {
   const TrendsScreen1({super.key});
@@ -20,6 +21,17 @@ class _TrendsScreen1State extends State<TrendsScreen1> {
     });
     Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
+
+  final List<String> cities = [
+    "Mumbai",
+    "Bengaluru",
+    "Chennai",
+    "Kerala",
+    "Delhi",
+    "Kolkata",
+    "Hyderabad",
+    "Pune",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +57,12 @@ class _TrendsScreen1State extends State<TrendsScreen1> {
           ],
         ),
       ),
-
+  body:Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: cities.map((city) => _buildCityRow(city, context)).toList(),
+        ),
+      ), 
       bottomNavigationBar: _buildBottomNavBar(screenWidth),
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
@@ -160,3 +177,34 @@ class _TrendsScreen1State extends State<TrendsScreen1> {
     );
   }
 }
+Widget _buildCityRow(String city, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TrendsScreen2(cityName: city),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              city,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
