@@ -11,7 +11,7 @@ class SearchService {
     required bool isBuy, // 🔥 Added isBuy
   }) async {
     try {
-      final uri = Uri.parse('http://192.168.1.3:5000/properties/search_properties');
+      final uri = Uri.parse('https://8fa4-2403-a080-1004-a111-25e7-6fd0-448b-ba9b.ngrok-free.app/properties/search_properties');
 
       Map<String, dynamic> body = {
         'location': locality,

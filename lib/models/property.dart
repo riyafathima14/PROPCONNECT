@@ -16,15 +16,15 @@ class PropertyBasic {
   });
 
   factory PropertyBasic.fromJson(Map<String, dynamic> json) {
-    return PropertyBasic(
-      id: json['id'],
-      title: json['title'],
-      location: json['location'],
-      price: json['price'].toDouble(),
-      rating: json['rating'].toDouble(),
-      imgURL: List<String>.from(json['imgURL']),
-    );
-  }
+  return PropertyBasic(
+    id: json['id'],
+    title: json['title'] ?? '',
+    location: json['location'] ?? '',
+    price: (json['price'] != null) ? json['price'].toDouble() : 0.0,
+    rating: (json['rating'] != null) ? json['rating'].toDouble() : 0.0,
+    imgURL: (json['imgURL'] != null) ? List<String>.from(json['imgURL']) : [],
+  );
+}
 }
 
 class PropertyDetails extends PropertyBasic {

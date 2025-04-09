@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/screens/verification_screen2.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:propconnect/services/api_service.dart';
 
 class VerificationScreen1 extends StatefulWidget {
   final String firstName;
@@ -53,7 +54,7 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
       }));
 
       final response = await http.post(
-        Uri.parse("http://127.0.0.1:5000/auth/send-otp"),
+        Uri.parse("https://9fa2-2403-a080-1006-3f86-dc54-9114-67b7-b581.ngrok-free.app/auth/send-otp"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "first_name": widget.firstName,
@@ -85,6 +86,7 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
       });
     }
   }
+
 
   void _navigateToVerificationScreen2() {
     Navigator.pushReplacement(
@@ -292,7 +294,7 @@ class _VerificationScreen1State extends State<VerificationScreen1> {
                   try {
                     final response = await http.post(
                       Uri.parse(
-                        "http://127.0.0.1:5000/auth/send-otp",
+                        "https://8fa4-2403-a080-1004-a111-25e7-6fd0-448b-ba9b.ngrok-free.app/auth/send-otp",
                       ), // Replace with your Flask backend IP
                       headers: {"Content-Type": "application/json"},
                       body: jsonEncode(requestBody),

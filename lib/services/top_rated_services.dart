@@ -6,7 +6,7 @@ import 'package:propconnect/models/property.dart';
 class TopRatedServices {
   static Future<List<PropertyBasic>> fetchTopRatedProperties() async {
     final response = await http.get(
-      Uri.parse('http://192.168.1.3:5000/properties/top-rated'),
+     Uri.parse('http://192.168.1.3:5000/properties/top-rated'),
     );
     print('Response Body: ${response.body}');
 

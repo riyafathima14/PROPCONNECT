@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class TrendsService {
+  static const String _baseUrl = 'http://192.168.1.3:5000';
   static Future<List<dynamic>> fetchTrendingProperties({String? city}) async {
+    
     try {
       // Construct the URL with an optional city filter
-      String url = 'http://192.168.1.3:5000/properties/trending';
+      String url = '$_baseUrl/properties/trending';
       if (city != null && city.isNotEmpty) {
         url += '?city=${Uri.encodeComponent(city)}';
       }

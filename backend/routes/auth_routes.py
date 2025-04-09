@@ -18,6 +18,7 @@ def send_otp():
     email = data.get('email')
     phone = data.get('phone').strip()
     password = data.get('password')
+    user_name=data.get('user_name')
 
     if not (first_name and last_name and password):
         return jsonify({"error": "First name, last name, and password are required"}), 400
@@ -45,40 +46,49 @@ def send_otp():
             db.session.commit()
             if email:
                 send_email_otp(email, otp)
-                return jsonify({"message": "OTP resent to email"}), 200
+                return jsonify({"message": "OTP sent to email"}), 200
             elif phone:
                 send_sms_otp(phone, otp)
-                return jsonify({"message": "OTP resent to phone"}), 200
+                return jsonify({"message": "OTP sent to phone"}), 200
         return jsonify({"error": "User already exists and verified"}), 400
 
-    new_user = User(first_name=first_name, last_name=last_name, email=email, phone=phone, password=password, otp=otp)
+    new_user = User(first_name=first_name, last_name=last_name, email=email, phone=phone, password=password, otp=otp,user_name=user_name)
 
    
     db.session.add(new_user)
     db.session.commit()
 
     if email:
-        send_email_otp(email, otp)
-        return jsonify({"message": "OTP sent to email"}), 200
+        if send_email_otp(email, otp):
+            return jsonify({"message": "OTP sent to email"}), 200
+        else:
+            return jsonify({"error": "Failed to resend OTP to email"}), 500
     elif phone:
-        send_sms_otp(phone, otp)
-        return jsonify({"message": "OTP sent to phone"}), 200
-    
+        if send_sms_otp(phone, otp):
+            return jsonify({"message": "OTP sent to phone"}), 200
+        else:
+            return jsonify({"error": "Failed to resend OTP to phone"}), 500
+
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user_name = data.get('user_name')
-    password = data.get('password')
+    print("Received data in /login:", data)
+    
+    # Trim whitespace for both values
+    user_name = data.get('user_name', '').strip()
+    password = data.get('password', '').strip()
 
     if not user_name or not password:
         return jsonify({"success": False, "message": "missing username or password"}), 400
 
     user = User.query.filter_by(user_name=user_name).first()
-
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
 
-    if not check_password_hash(user.password, password):
+    # For plaintext testing, compare directly with stripped versions.
+    print("Stored password:", repr(user.password))
+    print("Provided password:", repr(password))
+    if user.password.strip() != password:
         return jsonify({"success": False, "message": "Incorrect password"}), 401
 
     return jsonify({
@@ -86,7 +96,12 @@ def login():
         "message": "Login successful",
         "user_id": user.id,
         "user_name": user.user_name,
-        }), 200    
+        "user_name": user.user_name,
+        "email": user.email,
+        "phone": user.phone,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+    }), 200
 
 @auth_bp.route('/verify-otp', methods=['POST'])
 def verify_otp():

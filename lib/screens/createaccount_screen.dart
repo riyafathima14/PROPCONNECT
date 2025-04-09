@@ -114,13 +114,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 ),
               ),
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  String encryptedPassword = encryptPassword(
-                    passwordController.text,
-                  );
+                // if (_formKey.currentState!.validate()) {
+                //   String encryptedPassword = encryptPassword(
+                //     passwordController.text,
+                //   );
                   print('First Name: ${firstNameController.text}');
                   print('Last Name: ${lastNameController.text}');
-                  print('Password: $encryptedPassword');
+                  print('Password: ${passwordController.text}');
+                  print('username: ${usernameController.text}');
 
                   Navigator.pushReplacement(
                     context,
@@ -131,7 +132,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         lastName: lastNameController.text.trim(),
                         email: emailController.text.trim(),
                         phone: phoneController.text.trim(),
-                        encryptedPassword: encryptedPassword.trim(),
+                        encryptedPassword: passwordController.text.trim(),
                         username: usernameController.text.trim(),
                       ),
                       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -142,7 +143,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       },
                     ),
                   );
-                }
+              
               },
               child: Text("Continue", style: _buttonTextStyle(screenHeight)),
             ),
@@ -307,7 +308,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     fontWeight: FontWeight.w600,
     color: Colors.white,
   );
-  String encryptPassword(String password) {
-    return Crypt.sha256(password, salt: 'random_salt_here').toString();
-  }
+  // String encryptPassword(String password) {
+  //   return Crypt.sha256(password, salt: 'random_salt_here').toString();
+  // }
 }

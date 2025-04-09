@@ -1,24 +1,5 @@
-# routes/root.py
-<<<<<<< HEAD
-<<<<<<< HEAD
-from flask import Blueprint
-=======
-from flask import Blueprint, jsonify
->>>>>>> 21cfef73cc1af80d997592547894e284519365f5
-=======
-from flask import Blueprint, jsonify
->>>>>>> 21cfef73cc1af80d997592547894e284519365f5
-
-root_bp = Blueprint('root', __name__)  # create a blueprint
-
-@root_bp.route('/', methods=['GET'])   # define the '/' route
-<<<<<<< HEAD
-<<<<<<< HEAD
-def home():
-=======
+from flask import Blueprint,jsonify
+root_bp=Blueprint('root',__name__)
+@root_bp.route('/', methods=['GET']) 
 def root():
->>>>>>> 21cfef73cc1af80d997592547894e284519365f5
-=======
-def root():
->>>>>>> 21cfef73cc1af80d997592547894e284519365f5
-    return {"message": "✅ Flask Backend Connected Successfully!"}
+    return {"message": "✅ Flask Backend Connected Successfully!"}

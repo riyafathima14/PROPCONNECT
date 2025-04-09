@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:propconnect/providers/favorite_provider.dart';
 import 'package:propconnect/screens/property_details_screen.dart';
+import 'package:propconnect/screens/sellpage1.dart';
 import 'package:propconnect/screens/trends_screen1.dart';
 import 'package:propconnect/models/property.dart';
 import 'package:propconnect/screens/favorites_screen.dart';
@@ -13,6 +14,7 @@ import 'package:propconnect/widgets/review_section.dart';
 import 'package:provider/provider.dart';
 import 'package:propconnect/services/top_rated_services.dart';
 
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -22,6 +24,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String activeTab = "Home"; // Default active tab
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _reviewsKey = GlobalKey();
 
   void navigateTo(String tabName, Widget screen, BuildContext context) {
     setState(() {
@@ -34,7 +38,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _futureProperties = TopRatedServices.fetchTopRatedProperties(); // <-- only once
+    _futureProperties =
+        TopRatedServices.fetchTopRatedProperties(); // <-- only once
   }
 
   @override
@@ -200,19 +205,25 @@ class _HomePageState extends State<HomePage> {
                                   optionSize,
                                   textSize,
                                   () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SearchScreen1(selectedOption: 'buy'),
-          ),
-        );
-      },
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => SearchScreen1(
+                                              selectedOption: 'buy',
+                                            ),
+                                      ),
+                                    );
+                                  },
                                 ),
                                 _buildOption(
                                   "assets/images/sellicon.png",
                                   "Sell",
                                   optionSize,
-                                  textSize,(){}
+                                  textSize,
+                                  () {
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SellPage1()));
+                                  },
                                 ),
                                 _buildOption(
                                   "assets/images/renticon.png",
@@ -220,13 +231,16 @@ class _HomePageState extends State<HomePage> {
                                   optionSize,
                                   textSize,
                                   () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SearchScreen1(selectedOption: 'rent'),
-          ),
-        );
-      },
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => SearchScreen1(
+                                              selectedOption: 'rent',
+                                            ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
@@ -247,95 +261,107 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(width: 15),
                             _buildScrollableCard(
                               "assets/images/recommendations.png",
-                              "Recommendations",context
+                              "Recommendations",
+                              context,
                             ),
                             _buildScrollableCard(
                               "assets/images/prizetrends.png",
-                              "Price Trends",context
+                              "Price Trends",
+                              context,
                             ),
                             _buildScrollableCard(
                               "assets/images/reviews.png",
-                              "Reviews",context
+                              "Reviews",
+                              context,
                             ),
                             SizedBox(width: 15),
                           ],
                         ),
                       ),
                     ),
-                     FutureBuilder<List<PropertyBasic>>(
-                future: _futureProperties,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Text('No top-rated properties found.'),
-                    );
-                  } else if (snapshot.hasData) {
-                    final properties = snapshot.data!;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics:
-                          const NeverScrollableScrollPhysics(), // because you already have SingleChildScrollView
-                      itemCount: properties.length,
-                      itemBuilder: (context, index) {
-                        final property = properties[index];
+                    FutureBuilder<List<PropertyBasic>>(
+                      future: _futureProperties,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return const Center(
+                            child: Text('No top-rated properties found.'),
+                          );
+                        } else if (snapshot.hasData) {
+                          final properties = snapshot.data!;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics:
+                                const NeverScrollableScrollPhysics(), // because you already have SingleChildScrollView
+                            itemCount: properties.length,
+                            itemBuilder: (context, index) {
+                              final property = properties[index];
 
-                        return Consumer<FavoriteProvider>(
-                          builder: (context, favoriteProvider, child) {
-                            final isFavorite = favoriteProvider.isFavorite(
-                              property.id.toString(),
-                            );
+                              return Consumer<FavoriteProvider>(
+                                builder: (context, favoriteProvider, child) {
+                                  final isFavorite = favoriteProvider
+                                      .isFavorite(property.id.toString());
 
-                            return GestureDetector(
-                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => PropertyDetailScreen(
-                                         propertyId: property.id,
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => PropertyDetailScreen(
+                                                propertyId: property.id,
+                                              ),
                                         ),
-                                  ),
-                                );
-                              },
-                              child: buildPropertyCard(
-                                property: property,
-                                isFavorite: isFavorite,
-                                onFavoriteToggle: () {
-                                  final favoriteProperty = FavoriteProperty(
-                                    id: property.id.toString(),
-                                    title: property.title,
-                                    price: property.price,
-                                    rating: property.rating,
-                                    location: property.location,
-                                    imgURL:
-                                        property.imgURL.isNotEmpty
-                                            ? property.imgURL[0]
-                                            : '',
-                                  );
-                              
-                                  favoriteProvider.toggleFavorite(
-                                    favoriteProperty,
+                                      );
+                                    },
+                                    child: buildPropertyCard(
+                                      property: property,
+                                      isFavorite: isFavorite,
+                                      onFavoriteToggle: () {
+                                        final favoriteProperty =
+                                            FavoriteProperty(
+                                              id: property.id.toString(),
+                                              title: property.title,
+                                              price: property.price,
+                                              rating: property.rating,
+                                              location: property.location,
+                                              imgURL:
+                                                  property.imgURL.isNotEmpty
+                                                      ? property.imgURL[0]
+                                                      : '',
+                                            );
+
+                                        favoriteProvider.toggleFavorite(
+                                          favoriteProperty,
+                                        );
+                                      },
+                                    ),
                                   );
                                 },
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          );
+                        }
+                        // If none of the above conditions match, throw an exception.
+                        throw Exception(
+                          'Unexpected snapshot state: ${snapshot.connectionState}',
                         );
                       },
-                    );
-                  }
-                  // If none of the above conditions match, throw an exception.
-                  throw Exception(
-                    'Unexpected snapshot state: ${snapshot.connectionState}',
-                  );
-                },
-              ),
-                    const SizedBox(height: 10,),
-                    ReviewsSection(),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      key: _reviewsKey, // <- Attach key here
+                      child: ReviewsSection(),
+                    ),
                   ],
                 ),
               ),
@@ -373,7 +399,6 @@ class _HomePageState extends State<HomePage> {
                         onTap: () {
                           navigateTo("Trends", const TrendsScreen1(), context);
                         },
-                      
                       ),
                       const SizedBox(width: 40), // Space for FAB
                       _buildNavItem(
@@ -420,7 +445,9 @@ class _HomePageState extends State<HomePage> {
         ),
 
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SellPage1()));
+          },
           backgroundColor: Color(0xFF204ECF),
           shape: CircleBorder(),
           child: Icon(Icons.add, size: 28, color: Colors.white),
@@ -429,6 +456,102 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+  Widget _buildScrollableCard(
+  String imagePath,
+  String label,
+  BuildContext context,
+) {
+  return Padding(
+    padding: const EdgeInsets.only(right: 10),
+    child: GestureDetector(
+      onTap: () {
+        if (label == 'Recommendations') {
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder:
+                  (context, animation, secondaryAnimation) =>
+                      const RecommendatioScreen(),
+              transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+              ) {
+                var begin = 0.0;
+                var end = 1.0;
+                var tween = Tween(begin: begin, end: end);
+                var fadeAnimation = animation.drive(tween);
+                return FadeTransition(opacity: fadeAnimation, child: child);
+              },
+            ),
+          );
+        }
+        if (label == 'Price Trends') {
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder:
+                  (context, animation, secondaryAnimation) =>
+                      const TrendsScreen1(),
+              transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+              ) {
+                var begin = 0.0;
+                var end = 1.0;
+                var tween = Tween(begin: begin, end: end);
+                var fadeAnimation = animation.drive(tween);
+                return FadeTransition(opacity: fadeAnimation, child: child);
+              },
+            ),
+          );
+        }
+        if (label == 'Reviews') {
+          Scrollable.ensureVisible(
+        _reviewsKey.currentContext!,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+    );
+        }
+      },
+      child: Container(
+        width: 148,
+        height: 135,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade300,
+              blurRadius: 5,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(imagePath, height: 80, width: 80),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
 }
 
@@ -492,7 +615,9 @@ Widget _buildOption(
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: Image.asset(imagePath, height: size * 0.5)),
+                child: Center(
+                  child: Image.asset(imagePath, height: size * 0.5),
+                ),
               ),
               Text(
                 label,
@@ -511,64 +636,3 @@ Widget _buildOption(
   );
 }
 
-Widget _buildScrollableCard(String imagePath, String label,BuildContext context) {
-  return Padding(
-    padding: const EdgeInsets.only(right: 10),
-    child: GestureDetector(
-      onTap:(){ if(label=='Recommendations') {
-        Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder:
-                    (context, animation, secondaryAnimation) =>
-                        const RecommendatioScreen(),
-                transitionsBuilder: (
-                  context,
-                  animation,
-                  secondaryAnimation,
-                  child,
-                ) {
-                  var begin = 0.0;
-                  var end = 1.0;
-                  var tween = Tween(begin: begin, end: end);
-                  var fadeAnimation = animation.drive(tween);
-                  return FadeTransition(opacity: fadeAnimation, child: child);
-                },
-              ),
-            );
-      }},
-      child: Container(
-        width: 148,
-        height: 135,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 5,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(imagePath, height: 80, width: 80),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: GoogleFonts.nunito(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}

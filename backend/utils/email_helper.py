@@ -42,9 +42,12 @@ def send_email_otp(email, otp):
             server.starttls()
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, email, message.as_string())
+        current_app.logger.debug(f"MAIL_USERNAME: {sender_email}")
+        current_app.logger.debug(f"MAIL_PASSWORD: {'set' if sender_password else 'missing'}")
 
         current_app.logger.info(f"✅ OTP sent to {email}")
         return otp
     except Exception as e:
         current_app.logger.error(f"❌ Error sending OTP to {email}: {e}")
+        print("Error in send_email_otp:", e)
         return None

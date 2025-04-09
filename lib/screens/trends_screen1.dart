@@ -76,58 +76,6 @@ class _TrendsScreen1State extends State<TrendsScreen1> {
     );
   }
 
-<<<<<<< HEAD:lib/screens/trends_screen1.dart
-=======
-  Widget _buildNoFavoritesUI(double screenHeight, double screenWidth) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/nofavorite_img1.png',
-              width: 104,
-              height: 104,
-            ),
-            const SizedBox(height: 20),
-            RichText(
-  textAlign: TextAlign.center,
-  text: TextSpan(
-    style: GoogleFonts.nunito(
-      color: Colors.black,
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
-    ),
-    children: [
-      TextSpan(
-        text: "You haven't added\n",
-        style: GoogleFonts.nunito(
-          fontWeight: FontWeight.w700,
-          color: Colors.black,
-        ),
-      ),
-      const TextSpan(text: "any favourites yet."),
-    ],
-  ),
-),
-
-            const SizedBox(height: 10),
-            Text(
-              "Tap on the heart icon on property you like to see them here...",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.nunito(
-                color: const Color(0xFF787171),
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
->>>>>>> 21cfef73cc1af80d997592547894e284519365f5:lib/favorites_screen.dart
   Widget _buildBottomNavBar(double screenWidth) {
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),

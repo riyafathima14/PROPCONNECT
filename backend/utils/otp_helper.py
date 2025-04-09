@@ -26,4 +26,5 @@ def send_sms_otp(phone, otp):
         return otp
     except Exception as e:
         current_app.logger.error(f"❌ Error sending OTP to {phone}: {e}")
+        print("Error in send_sms_otp:", e) 
         return None
